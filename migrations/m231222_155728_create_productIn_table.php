@@ -12,13 +12,13 @@ class m231222_155728_create_productIn_table extends Migration
      */
     public function safeUp()
     {
-        $this->createTable('{{%productIn}}', [
+        $this->createTable('product_in', [
             'id' => $this->primaryKey(),
             'invoice' => $this->string(50)->notNull(),
-            'userId'=>$this->integer(11)->notNull(),
-            'productId'=>$this->integer(11)->notNull(),
-            'qtyIn'=>$this->integer(11)->notNull(),
-            'date'=>$this->date()->notNull(),
+            'userId' => $this->integer(11)->notNull(),
+            'productId' => $this->integer(11)->notNull(),
+            'qtyIn' => $this->integer(11)->notNull(),
+            'datePublished' => $this->date()->notNull()
         ]);
     }
 
@@ -27,6 +27,6 @@ class m231222_155728_create_productIn_table extends Migration
      */
     public function safeDown()
     {
-        $this->dropTable('{{%productIn}}');
+        $this->dropTable('product_in');
     }
 }

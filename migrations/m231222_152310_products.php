@@ -12,15 +12,21 @@ class m231222_152310_products extends Migration
      */
     public function safeUp()
     {
-        $this->createTable('products',[
+        $this->createTable('products', [
             'id' => $this->primaryKey(),
-            'invoice'=>$this->string(50)->notNull(),
-            'pName'=>$this->string(50)->notNull(),
-            'pCategory'=>$this->string(50)->notNull(),
-            'price'=>$this->integer(11)->notNull(),
-            'Qty'=>$this->integer(11)->notNull(),
-            'pImage'=>$this->string(225),
-            'datePublished'=>$this->date()->notNull()
+            'invoice' => $this->string(50)->notNull(),
+            'nameProduct' => $this->string(50)->notNull(),
+            'typeProduct' => $this->string(50)->notNull(),
+            'unit' => $this->string(50)->notNull(),
+            'price' => $this->integer(11)->notNull(),
+            'price' => $this->integer(11)->notNull(),
+            'stockFirst' => $this->integer(11)->notNull(),
+            'stockIn' => $this->integer(11)->notNull(),
+            'stockOut' => $this->integer(11)->notNull(),
+            'stockFinal' => $this->integer(11)->notNull(),
+            'imageProduct' => $this->string(255)->notNull(),
+            'datePublished' => $this->date()->notNull(),
+            'active' => $this->integer(11)->notNull()
         ]);
     }
 
