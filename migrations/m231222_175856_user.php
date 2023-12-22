@@ -1,6 +1,7 @@
 <?php
 
 use yii\db\Migration;
+use app\models\User;
 
 /**
  * Class m231222_175856_user
@@ -20,14 +21,14 @@ class m231222_175856_user extends Migration
             'authKey' => $this->string(255)->notNull(),
             'accessToken' => $this->string(255),
             'role' => $this->integer(11)->notNull(),
-            'imageUser' => $this->string(50)->notNull(),
+            'imageUser' => $this->string(50),
             'active' => $this->integer(11)->notNull()
         ]);
         
         $this->insert('user', [
             'fullName' => 'Administrator',
             'userName' => 'admin',
-            'password' => '$2y$13$j2gzOJjz7vID2.CNAFcM/uz/f7bzbKpdbNYi01Cj.Qf.dD3arcKga',
+            'password' => '$2y$13$1J4MLBTSOCL26XG1RvQcPOs1E4hP3TOp96Cbrm6GOWQb2AyFNLQFe',
             'authKey' => 'eCDSVGMu92s7-A13HKqd1u4xBQnMSExo',
             'accessToken' => null,
             'role' => User::ROLE_ADMIN,

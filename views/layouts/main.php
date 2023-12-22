@@ -1,6 +1,7 @@
 <?php
 use yii\helpers\Html;
 use dmstr\widgets\Alert;
+use dmstr\adminlte\web\AdminLteAsset;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
@@ -24,7 +25,7 @@ if ($actionId === 'login' || $actionId === 'register') {
         app\assets\AppAsset::register($this);
     }
 
-    dmstr\web\AdminLteAsset::register($this);
+    AdminLteAsset::register($this);
 
     $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed2010/adminlte/dist');
     $imgUser = Yii::getAlias('@web/img/user/');

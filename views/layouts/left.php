@@ -2,6 +2,7 @@
 
 use app\models\User;
 use yii\helpers\Html;
+use dmstr\adminlte\widgets\Menu;
 ?>
 <aside class="main-sidebar">
 
@@ -33,7 +34,7 @@ use yii\helpers\Html;
         <!-- /.search form -->
 
         <?=
-        dmstr\widgets\Menu::widget(
+        Menu::widget(
             [
                 'options' => ['class' => 'sidebar-menu tree', 'data-widget' => 'tree'],
                 'items' => [

@@ -6,14 +6,19 @@ use yii\bootstrap5\ActiveForm;
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $model \common\models\LoginForm */
 
-$this->title = 'Login - ' . Yii::$app->name;
+$this->title = 'Register - ' . Yii::$app->name;
 
 $fieldOptions1 = [
+    'options' => ['class' => 'form-group has-feedback'],
+    'inputTemplate' => "{input}<span class='glyphicon glyphicon-user form-control-feedback'></span>"
+];
+
+$fieldOptions2 = [
     'options' => ['class' => 'form-group has-feedback'],
     'inputTemplate' => "{input}<span class='glyphicon glyphicon-envelope form-control-feedback'></span>"
 ];
 
-$fieldOptions2 = [
+$fieldOptions3 = [
     'options' => ['class' => 'form-group has-feedback'],
     'inputTemplate' => "{input}<span class='glyphicon glyphicon-lock form-control-feedback'></span>"
 ];
@@ -25,30 +30,44 @@ $fieldOptions2 = [
     </div>
     <!-- /.login-logo -->
     <div class="login-box-body">
-        <?php if (Yii::$app->session->getFlash('success') !== NULL) { ?>
-            <div class="alert alert-success">
-                <?= Yii::$app->session->getFlash('success'); ?>
+        <?php if (Yii::$app->session->getFlash('error') !== NULL) { ?>
+            <div class="alert alert-warning">
+                <?= Yii::$app->session->getFlash('error'); ?>
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
         <?php } ?>
-        <p class="login-box-msg">Sign in to start your session</p>
+        <p class="login-box-msg">Sign up your  account.</p>
 
-        <?php $form = ActiveForm::begin(['id' => 'login-form', 'enableClientValidation' => false]); ?>
+        <?php $form = ActiveForm::begin(['id' => 'register-form', 'enableClientValidation' => false]); ?>
 
         <?=
             $form
-            ->field($model, 'userName', $fieldOptions1)
+            ->field($model, 'fullName', $fieldOptions1)
             ->label(false)
-            ->textInput(['autofocus' => true, 'placeholder' => $model->getAttributeLabel('Enter Username...')])
+            ->textInput(['autofocus' => true, 'placeholder' => $model->getAttributeLabel('Enter Your Full Name...')])
         ?>
 
         <?=
             $form
-            ->field($model, 'password', $fieldOptions2)
+            ->field($model, 'userName', $fieldOptions2)
+            ->label(false)
+            ->textInput(['placeholder' => $model->getAttributeLabel('Enter Username...')])
+        ?>
+
+        <?=
+            $form
+            ->field($model, 'password', $fieldOptions3)
             ->label(false)
             ->passwordInput(['placeholder' => $model->getAttributeLabel('Enter Password...')])
+        ?>
+
+        <?=
+            $form
+            ->field($model, 'passwordConfirm', $fieldOptions3)
+            ->label(false)
+            ->passwordInput(['placeholder' => $model->getAttributeLabel('Enter Confirm Password...')])
         ?>
 
         <div class="row">
@@ -57,7 +76,8 @@ $fieldOptions2 = [
             </div>
             <!-- /.col -->
             <div class="col-xs-4">
-                <?= Html::submitButton('Login',
+                <?=
+                Html::submitButton('Register',
                     ['class' => 'btn btn-primary btn-block btn-flat', 'name' => 'login-button'])
                 ?>
             </div>
@@ -76,11 +96,8 @@ $fieldOptions2 = [
                 </div>-->
         <!-- /.social-auth-links -->
 
-        <a href="#">I forgot my password</a><br>
-        <?= Html::a('Register a new membership', ['register'],
-            ['class' => 'text-center'])
-        ?>
-
+        <!--        <a href="#">I forgot my password</a><br>-->
+<?= Html::a('Already Login ? ', ['login'], ['class' => 'text-center']) ?>
 
     </div>
     <!-- /.login-box-body -->
