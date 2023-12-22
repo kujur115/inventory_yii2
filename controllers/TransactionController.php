@@ -2,11 +2,12 @@
 
 namespace app\controllers;
 
+use Yii;
 use app\models\Transaction;
-use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 /**
  * TransactionController implements the CRUD actions for Transaction model.
@@ -14,53 +15,49 @@ use yii\filters\VerbFilter;
 class TransactionController extends Controller
 {
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function behaviors()
     {
-        return array_merge(
-            parent::behaviors(),
-            [
-                'verbs' => [
-                    'class' => VerbFilter::className(),
-                    'actions' => [
-                        'delete' => ['POST'],
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'actions' => ['logout', 'index', 'create', 'view', 'update', 'delete'],
+                        'allow' => true,
+                        'roles' => ['@'],
                     ],
                 ],
-            ]
-        );
+            ],
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['post'],
+                ],
+            ],
+        ];
     }
 
     /**
      * Lists all Transaction models.
-     *
-     * @return string
+     * @return mixed
      */
     public function actionIndex()
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => Transaction::find(),
-            /*
-            'pagination' => [
-                'pageSize' => 50
-            ],
-            'sort' => [
-                'defaultOrder' => [
-                    'id' => SORT_DESC,
-                ]
-            ],
-            */
-        ]);
-
+        $model = new Transaction();
+        
+        $model->load(Yii::$app->request->get());
+        
         return $this->render('index', [
-            'dataProvider' => $dataProvider,
+            'model' => $model,
         ]);
     }
 
     /**
      * Displays a single Transaction model.
-     * @param int $id ID
-     * @return string
+     * @param integer $id
+     * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionView($id)
@@ -73,18 +70,14 @@ class TransactionController extends Controller
     /**
      * Creates a new Transaction model.
      * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return string|\yii\web\Response
+     * @return mixed
      */
     public function actionCreate()
     {
         $model = new Transaction();
 
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        } else {
-            $model->loadDefaultValues();
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['index']);
         }
 
         return $this->render('create', [
@@ -95,16 +88,16 @@ class TransactionController extends Controller
     /**
      * Updates an existing Transaction model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param int $id ID
-     * @return string|\yii\web\Response
+     * @param integer $id
+     * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['index']);
         }
 
         return $this->render('update', [
@@ -115,8 +108,8 @@ class TransactionController extends Controller
     /**
      * Deletes an existing Transaction model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param int $id ID
-     * @return \yii\web\Response
+     * @param integer $id
+     * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionDelete($id)
@@ -129,13 +122,13 @@ class TransactionController extends Controller
     /**
      * Finds the Transaction model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param int $id ID
+     * @param integer $id
      * @return Transaction the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Transaction::findOne(['id' => $id])) !== null) {
+        if (($model = Transaction::findOne($id)) !== null) {
             return $model;
         }
 

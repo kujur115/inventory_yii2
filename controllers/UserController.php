@@ -3,19 +3,16 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\ProductIn;
-use app\models\Products;
-use app\models\Transaction;
+use app\models\User;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
-use yii\helpers\Json;
 
 /**
- * ProductInController implements the CRUD actions for ProductIn model.
+ * UserController implements the CRUD actions for User model.
  */
-class ProductInController extends Controller {
+class UserController extends Controller {
     /**
      * {@inheritdoc}
      */
@@ -41,122 +38,136 @@ class ProductInController extends Controller {
     }
 
     /**
-     * Lists all ProductIn models.
+     * Lists all User models.
      * @return mixed
      */
     public function actionIndex() {
-        $model = new ProductIn();
+        if (!(Yii::$app->user->identity->role === User::ROLE_ADMIN)) {
+            Yii::$app->session->setFlash('error',
+                'Sorry, you\'re not permission on this session.');
+            return $this->goHome();
+        }
+
+        $model = new User();
 
         $model->load(Yii::$app->request->get());
 
         return $this->render('index',
                 [
-                'model' => $model,
+                    'model' => $model,
         ]);
     }
 
     /**
-     * Displays a single ProductIn model.
+     * Displays a single User model.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionView($id) {
+        if (!(Yii::$app->user->identity->role === User::ROLE_ADMIN)) {
+            Yii::$app->session->setFlash('error',
+                'Sorry, you\'re not permission on this session.');
+            return $this->goHome();
+        }
+        
+        $model = $this->findModel($id);
+
         return $this->render('view',
                 [
-                    'model' => $this->findModel($id),
+                    'model' => $model,
         ]);
     }
 
     /**
-     * Creates a new ProductIn model.
+     * Creates a new User model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate() {
-        $model = new ProductIn();
+        if (!(Yii::$app->user->identity->role === User::ROLE_ADMIN)) {
+            Yii::$app->session->setFlash('error',
+                'Sorry, you\'re not permission on this session.');
+            return $this->goHome();
+        }
 
-        if ($model->load(Yii::$app->request->post())) {
-            $model->userId = Yii::$app->user->identity->id;
-            $dataQty = $model->qtyIn;
-            $dataProduct = $model->productId;
-            if (!($model->sumProduct($dataQty, $dataProduct) && $model->createTransaction() && $model->save())) {
-                return $this->render('create', ['model' => $model]);
-            }
+        $model = new User();
+        if ($model->load(Yii::$app->request->post()) && $model->validateUsername() && $model->newUser()) {
             return $this->redirect(['index']);
         }
 
-        return $this->render('create', ['model' => $model]);
+        return $this->render('create',
+                [
+                    'model' => $model,
+        ]);
     }
 
     /**
-     * Updates an existing ProductIn model.
+     * Updates an existing User model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionUpdate($id) {
-        $model = $this->findModel($id);
-        $dataQty = $model->qtyIn;
-        $dataProduct = $model->productId;
-        $dataInvoice = $model->invoice;
-
-        if ($model->load(Yii::$app->request->post())) {
-            if($dataProduct != $model->productId){
-                $model->sumProduct($model->qtyIn, $model->productId);
-                $dataQty = 0 - $dataQty;
-            }else{
-                if ($dataQty != $model->qtyIn){
-                    $dataQty = $model->qtyIn - $dataQty;
-                } else {
-                    $dataQty = 0;
-                }
-            }
-            if(!($model->sumProduct($dataQty, $dataProduct) && $model->createTransaction(true, $dataInvoice) && $model->save())){
-                return $this->render('update', ['model' => $model]);
-            }
-            return $this->redirect(['index']);
+        if (!(Yii::$app->user->identity->role === User::ROLE_ADMIN)) {
+            Yii::$app->session->setFlash('error',
+                'Sorry, you\'re not permission on this session.');
+            return $this->goHome();
         }
 
+        $model = $this->findModel($id);
+
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->newPassword == $model->newPasswordConfirm) {
+                if ($model->validatePassword($model->oldPassword)) {
+                    $model->setPassword($model->newPassword);
+                    $model->generateAuthKey();
+                    $model->save();
+
+                    return $this->redirect(['index']);
+                } else {
+                    $model->addError('oldPassword', 'You\'re password must same to proccess update, try again.');
+                }
+            } else {
+                $model->addError('newPasswordConfirm', 'New Password Confirm must same, try again.');
+            }
+        }
         return $this->render('update', ['model' => $model]);
     }
 
     /**
-     * Deletes an existing ProductIn model.
+     * Deletes an existing User model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionDelete($id) {
+        if (!(Yii::$app->user->identity->role === User::ROLE_ADMIN)) {
+            Yii::$app->session->setFlash('error',
+                'Sorry, you\'re not permission on this session.');
+            return $this->goHome();
+        }
+
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
     }
-
-    public function actionList($id) {
-        $countInvoice = Products::find()->where(['id' => $id])->count();
-        $invoices = Products::find()->where(['id' => $id])->all();
-
-        if ($countInvoice > 0) {
-            foreach ($invoices as $invoice) {
-                echo '<input type="text" value="' . $invoice->invoice . '">';
-            }
-        } else {
-            echo '<input type="text" placeholder="Enter Name Product...">';
-        }
+    
+    public function actionProfile($id) {
+        
     }
 
     /**
-     * Finds the ProductIn model based on its primary key value.
+     * Finds the User model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return ProductIn the loaded model
+     * @return User the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id) {
-        if (($model = ProductIn::findOne($id)) !== null) {
+        if (($model = User::findOne($id)) !== null) {
             return $model;
         }
 
