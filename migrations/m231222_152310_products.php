@@ -14,7 +14,7 @@ class m231222_152310_products extends Migration
     {
         $this->createTable('products',[
             'id' => $this->primaryKey(),
-            'pId'=>$this->string(50)->notNull(),
+            'invoice'=>$this->string(50)->notNull(),
             'pName'=>$this->string(50)->notNull(),
             'pCategory'=>$this->string(50)->notNull(),
             'price'=>$this->integer(11)->notNull(),
